@@ -1,1 +1,0 @@
-Natepad is a web-based Notes Generator designed to help CEG agents create standardized, complete, and accurate call notes. The tool aims to reduce markdowns caused by missing or incorrect documentation while ensuring proper Qualicode assignment and consistent note formatting.
