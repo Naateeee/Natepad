@@ -94,8 +94,7 @@
   const SELECT_OPTIONS = {
     customer: [
       { value: '1', text: 'Account Holder' },
-      { value: '2', text: 'Husband' },
-      { value: '3', text: 'Wife' },
+      { value: '2', text: 'Spouse' },
       { value: '4', text: 'Authorized person' },
       { value: '5', text: 'Others' },
     ],
@@ -125,7 +124,7 @@
       { value: '3', text: 'Satlite' },
       { value: '4', text: 'Cignal Play' },
       { value: '5', text: 'Pilipinas Live' },
-      { value: '6', text: 'Other OTTs - HBO/Disney/Heyu' },
+      { value: '6', text: 'Other OTTs - HBO/Disney/Hayu' },
     ],
   };
 
@@ -234,16 +233,16 @@
 
     'OTT|Product Inquiry|Cignal Play': '4800',
     'OTT|Product Inquiry|Pilipinas Live': '5800',
-    'OTT|Product Inquiry|Other OTTs - HBO/Disney/Heyu': '7800',
+    'OTT|Product Inquiry|Other OTTs - HBO/Disney/Hayu': '7800',
     'OTT|Tech Issues|Cignal Play': '4801',
     'OTT|Tech Issues|Pilipinas Live': '5801',
-    'OTT|Tech Issues|Other OTTs - HBO/Disney/Heyu': '7801',
+    'OTT|Tech Issues|Other OTTs - HBO/Disney/Hayu': '7801',
     'OTT|Payment Issues|Cignal Play': '4802',
     'OTT|Payment Issues|Pilipinas Live': '5802',
-    'OTT|Payment Issues|Other OTTs - HBO/Disney/Heyu': '7802',
+    'OTT|Payment Issues|Other OTTs - HBO/Disney/Hayu': '7802',
     'OTT|Other Issues|Cignal Play': '4803',
     'OTT|Other Issues|Pilipinas Live': '5803',
-    'OTT|Other Issues|Other OTTs - HBO/Disney/Heyu': '7803',
+    'OTT|Other Issues|Other OTTs - HBO/Disney/Hayu': '7803',
   };
 
   // =====================================================================
@@ -266,6 +265,35 @@
     qualiCodeInput: document.getElementById('qualiCode'),
     notesCharacterCount: document.getElementById('notesCharacterCount'),
   };
+
+  if (inputs.newMobileNumberInput) {
+    inputs.newMobileNumberInput.addEventListener('input', () => {
+      inputs.newMobileNumberInput.value = inputs.newMobileNumberInput.value.replace(/\D/g, '').slice(0, 11);
+    });
+  }
+
+  const newEmailAddressFeedback = document.getElementById('newEmailAddressFeedback');
+  function validateNewEmailAddress(showFeedback = true) {
+    const email = inputs.newEmailAddressInput;
+    if (!email) return true;
+    const isValid = email.checkValidity();
+    if (showFeedback) {
+      email.classList.toggle('is-invalid', !isValid);
+      if (newEmailAddressFeedback) {
+        newEmailAddressFeedback.textContent = email.value.trim()
+          ? 'Enter a valid email address, such as name@example.com.'
+          : 'Email address is required.';
+      }
+    }
+    return isValid;
+  }
+
+  if (inputs.newEmailAddressInput) {
+    inputs.newEmailAddressInput.addEventListener('blur', () => validateNewEmailAddress());
+    inputs.newEmailAddressInput.addEventListener('input', () => {
+      if (inputs.newEmailAddressInput.classList.contains('is-invalid')) validateNewEmailAddress();
+    });
+  }
 
   function getDisplayValue(input) {
     if (!input) return '';
@@ -347,7 +375,11 @@
       lineByKey[parentKey] = lineByKey[parentKey] ? `${lineByKey[parentKey]} - ${childValue}` : childValue;
     });
 
-    const generatedNotes = fields.map(([key]) => lineByKey[key]).filter(Boolean);
+    const hiddenPreviewFields = new Set(['accountTypeSelect', 'serviceTypeSelect', 'categorySelect']);
+    const generatedNotes = fields
+      .filter(([key]) => !hiddenPreviewFields.has(key))
+      .map(([key]) => lineByKey[key])
+      .filter(Boolean);
 
     if (inputs.notesValue) {
       inputs.notesValue.value = generatedNotes.length ? generatedNotes.join('\n') : '';
@@ -376,7 +408,7 @@
     const isOttAccount = [
       'Cignal Play',
       'Pilipinas Live',
-      'Other OTTs - HBO/Disney/Heyu',
+      'Other OTTs - HBO/Disney/Hayu',
     ].includes(accountText);
     const ottOption = Array.from(service.options).find((option) => option.text.trim() === 'OTT');
     const othersOption = Array.from(service.options).find((option) => option.text.trim() === 'Others');
@@ -464,7 +496,7 @@
   const customerDropdownCol = document.getElementById('customerDropdownCol');
   if (customer && customerOthersRow) {
     const updateCustomerOthers = () => {
-      const visible = customer.value === '5';
+      const visible = customer.value === '4' || customer.value === '5';
       customerOthersRow.style.display = visible ? 'flex' : 'none';
       if (inputs.customerOthersInput) {
         inputs.customerOthersInput.required = visible;
@@ -501,7 +533,10 @@
       }
       if (inputs.newEmailAddressInput) {
         inputs.newEmailAddressInput.required = showEmail;
-        if (!showEmail) inputs.newEmailAddressInput.value = '';
+        if (!showEmail) {
+          inputs.newEmailAddressInput.value = '';
+          inputs.newEmailAddressInput.classList.remove('is-invalid');
+        }
       }
 
       generateNotes();
