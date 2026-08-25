@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en" data-layout="horizontal" data-layout-width="boxed" data-bs-theme="light" data-topbar="light" data-sidebar="default" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+
+<head>
+
+    <meta charset="utf-8" />
+    <title>Natepad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Natepad - A simple note-taking app" name="description" />
+    <meta content="Natepad" name="author" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+
+    <!-- Layout config Js -->
+    <script src="assets/js/layout.js"></script>
+    <!-- Bootstrap Css -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <!-- custom Css-->
+    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .theme-color-picker-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-left: 0.45rem;
+            padding-left: 0.2rem;
+        }
+
+        .header-theme-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-right: 0.25rem;
+        }
+
+        .header-theme-controls .header-item {
+            display: flex !important;
+            align-items: center;
+            margin: 0 !important;
+        }
+
+        .theme-color-picker-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.03);
+            line-height: 1;
+            position: relative;
+            top: 4px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .theme-color-picker-label:hover,
+        .theme-color-picker-label:focus-within,
+        .header-theme-controls .light-dark-mode:hover,
+        .header-theme-controls .light-dark-mode:focus-visible,
+        [data-theme="material"] .header-theme-controls .light-dark-mode:hover,
+        [data-theme="material"] .header-theme-controls .light-dark-mode:focus-visible {
+            box-shadow: 0 0.35rem 0.85rem rgba(15, 23, 42, 0.18) !important;
+            transform: translateY(-1px);
+        }
+
+        .theme-color-picker {
+            width: 1.2rem;
+            height: 1.2rem;
+            border: none;
+            padding: 0;
+            background: transparent;
+            cursor: pointer;
+            display: block;
+        }
+
+        .header-theme-controls .light-dark-mode {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.03);
+            transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .theme-color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .theme-color-picker::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+
+        .theme-color-picker::-moz-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+
+        .theme-color-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            color: var(--vz-header-item-sub-color, #6b7280);
+            text-transform: uppercase;
+            user-select: none;
+            opacity: 0.9;
+        }
+
+        .theme-color-help {
+            font-size: 0.7rem;
+            color: var(--vz-header-item-sub-color, #6b7280);
+            opacity: 0.8;
+            user-select: none;
+        }
+
+        .app-logo {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            height: 42px;
+            padding: 0;
+            text-decoration: none;
+            --logo-color: #111827;
+        }
+
+        .app-logo-image {
+            display: block;
+            width: 138px;
+            max-width: 138px;
+            height: 24px;
+            background: var(--logo-color, #111827);
+            -webkit-mask: url("assets/images/natepad-dark.png") center / contain no-repeat;
+            mask: url("assets/images/natepad-dark.png") center / contain no-repeat;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            transform: translateY(1px);
+            opacity: 0.98;
+        }
+
+        [data-bs-theme=dark] .app-logo,
+        [data-bs-theme=dark] .app-logo-image,
+        [data-topbar=dark] .app-logo,
+        [data-topbar=dark] .app-logo-image {
+            display: inline-flex !important;
+        }
+
+        #notes_value {
+            resize: none;
+            min-height: 465px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #layout-wrapper {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-content {
+            height: calc(100vh - 71px);
+            margin-top: 71px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .main-content .page-content {
+            margin-top: 0;
+            padding-top: 16px;
+        }
+
+        @media (max-width: 575.98px) {
+            .main-content {
+                height: calc(100vh - 71px);
+                margin-top: 71px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+
+        <header id="page-topbar">
+    <div class="layout-width">
+        <div class="navbar-header">
+            <div class="d-flex">
+                <!-- LOGO -->
+                <div class="navbar-brand-box horizontal-logo">
+                    <a href="index.html" class="logo app-logo" aria-label="Natepad home">
+                        <span class="app-logo-image" aria-label="Natepad logo" role="img"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center header-theme-controls">
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                        <label class="theme-color-picker-label" for="primaryColorPicker" title="Choose a primary color or click again to reset to default">
+                            <input id="primaryColorPicker" type="color" value="#405189" class="theme-color-picker" aria-label="Choose primary color" />
+                        </label>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle light-dark-mode">
+                        <i class='bx bx-moon fs-22'></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</header>
+
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="container-fluid">
+
+                    <!-- start page title -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                                <h4 class="mb-sm-0">Notes Generator</h4>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end page title -->
+
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="card">
+
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Call out details</h4>
+                                </div>
+
+                                <div class="card-body">
+                                    
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="customer" class="form-label">Customer</label>
+                                        </div>
+                                        <div class="col-lg-9" id="customerDropdownCol">
+                                            <select class="form-select" id="customer" oninput="generateNotes()"></select>
+                                        </div>
+
+                                        <div class="col-lg-5" id="customerOthersRow" style="display: none;">
+                                            <input type="text" class="form-control" id="customerOthers" placeholder="Please specify..." style="min-width: 200px;" oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="databaseCleanup" class="form-label">Db clean-up</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <select class="form-select" id="databaseCleanup" oninput="generateNotes()"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3" id="updatedFieldsRow" style="display: none;">
+                                        <div class="col-lg-3"></div>
+                                        <div class="col-lg-4" id="newMobileNumberCol" style="display: none;">
+                                            <input type="text" class="form-control" id="newMobileNumber" placeholder="New mobile # ..." oninput="generateNotes()" >
+                                        </div>
+
+                                        <div class="col-lg-5" id="newEmailAddressCol" style="display: none;">
+                                            <input type="email" class="form-control" id="newEmailAddress" placeholder="New email address @ ..." oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="accountType" class="form-label">Account Type</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <select class="form-select" id="accountType" oninput="generateNotes()"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="serviceType" class="form-label">Service Type</label>
+                                        </div>
+                                        <div class="col-lg-9" id="serviceDropdownCol">
+                                            <select class="form-select" id="serviceType" oninput="generateNotes()"></select>
+                                        </div>
+
+                                        <div class="col-lg-5" id="serviceOthersRow" style="display: none;">
+                                            <input type="text" class="form-control" id="serviceOthers" placeholder="Please specify..." style="min-width: 200px;" oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="category" class="form-label">Category</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <select class="form-select" id="category" oninput="generateNotes()"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="resolution" class="form-label">Resolution</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <input type="text" class="form-control" id="resolution" placeholder="" oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="upsell" class="form-label">Upsell</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <input type="text" class="form-control" id="upsell" placeholder="" oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="ticketNumber" class="form-label">Ticket Number</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <input type="text" class="form-control" id="ticketNumber" placeholder="" oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-3">
+                                            <label for="qualiCode" class="form-label">Quali Code</label>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <input type="text" class="form-control" id="qualiCode" placeholder="" disabled readonly oninput="generateNotes()">
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-12 d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-danger" id="resetBtn">
+                                                <i class="bx bx-reset"></i> Reset
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div> <!-- end col -->
+
+
+                        <div class="col-lg-5">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Preview</h4>
+                                </div><!-- end card header -->
+                                <div class="card-body">
+                                    <div class="row align-items-center mb-3">
+                                        <div class="col-lg-12">
+                                            <textarea class="form-control" id="notes_value" placeholder="Preview will be shown here..." readonly></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-12 d-flex justify-content-between align-items-center gap-2">
+                                            <small class="text-muted" id="notesCharacterCount" aria-live="polite">0 characters</small>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-secondary" id="copyFullBtn">
+                                                    <i class="bx bx-copy"></i> Copy
+                                                </button>
+                                                <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><a class="dropdown-item" href="#" id="copyPart1">Copy 1st part</a></li>
+                                                    <li><a class="dropdown-item" href="#" id="copyPart2">Copy 2nd part</a></li>
+                                                    <li><a class="dropdown-item" href="#" id="copyPart3">Copy 3rd part</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div> <!-- end col -->
+
+                    </div> <!-- end row -->
+
+                </div> <!-- container-fluid -->
+            </div>
+            <!-- End Page-content -->
+
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <script>document.write(new Date().getFullYear())</script> © Natepad.
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-sm-end d-none d-sm-block">
+                                Design & Develop by CEG Support
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        <!-- end main content-->
+
+    </div>
+    <!-- END layout-wrapper -->
+
+
+
+    <!--start back-to-top-->
+    <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+    <!--end back-to-top-->
+
+    <!--preloader-->
+    <div id="preloader">
+        <div id="status">
+            <div class="spinner-border text-primary avatar-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="assets/libs/node-waves/waves.min.js"></script>
+    <script src="assets/libs/feather-icons/feather.min.js"></script>
+    <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
+    <script src="assets/js/plugins.js"></script>
+
+    <!-- prismjs plugin -->
+    <script src="assets/libs/prismjs/prism.js"></script>
+
+    <script src="assets/js/base.js"></script>
+
+</body>
+
+</html>
