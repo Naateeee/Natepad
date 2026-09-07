@@ -242,14 +242,4 @@ Natepad is developed as a lightweight web application utilizing dynamic form log
 
 ---
 
-## 11. Changelog
-
-| Version | Date       | Changes                                         |
-| ------- | ---------- | ----------------------------------------------- |
-| v1.0.0  | —          | Initial release — core notes generator          |
-
-> Update this section with actual release dates as changes are deployed.
-
----
-
 *© Natepad. Design & Developed by CEG Support.*
