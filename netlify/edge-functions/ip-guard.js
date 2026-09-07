@@ -5,17 +5,61 @@ export default async (request, context) => {
 
   const allowedIPsRaw = Deno.env.get("ALLOWED_IPS") || "";
 
-  // I-clean muna natin: tanggalin ang whitespace/newlines, at i-filter out ang mga blangkong entries
-  // (para hindi masira kahit may trailing comma o extra spaces sa env variable)
   const allowedPatterns = allowedIPsRaw
     .split(",")
     .map((ip) => ip.trim())
     .filter((ip) => ip.length > 0);
 
-  // Function na nagche-check kung tugma ang visitor IP sa isang pattern
-  // Sinusuportahan niya ang exact match (115.146.187.107)
-  // At wildcard match (103.11.xxx.xxx o 103.11.*.* )
+  function ipToNumber(ip) {
+    const parts = ip.split(".");
+
+    if (
+      parts.length !== 4 ||
+      parts.some((part) => !/^\d+$/.test(part) || Number(part) > 255)
+    ) {
+      return null;
+    }
+
+    return parts.reduce((number, part) => number * 256 + Number(part), 0);
+  }
+
   function matchesPattern(ip, pattern) {
+    const ipNumber = ipToNumber(ip);
+
+    if (ipNumber === null) return false;
+
+    if (pattern.includes("/")) {
+      const [network, prefixLength] = pattern.split("/");
+      const networkNumber = ipToNumber(network);
+      const prefix = Number(prefixLength);
+
+      if (
+        networkNumber === null ||
+        !/^\d+$/.test(prefixLength) ||
+        prefix < 0 ||
+        prefix > 32
+      ) {
+        return false;
+      }
+
+      const mask = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+      return (ipNumber & mask) === (networkNumber & mask);
+    }
+
+    if (pattern.includes("-")) {
+      const [rangeStart, rangeEnd] = pattern.split("-").map((value) => value.trim());
+      const startNumber = ipToNumber(rangeStart);
+      const endNumber = ipToNumber(rangeEnd);
+
+      return (
+        startNumber !== null &&
+        endNumber !== null &&
+        startNumber <= endNumber &&
+        ipNumber >= startNumber &&
+        ipNumber <= endNumber
+      );
+    }
+
     const ipParts = ip.split(".");
     const patternParts = pattern.split(".");
 
